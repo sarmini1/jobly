@@ -5,6 +5,7 @@
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
 const { UnauthorizedError } = require("../expressError");
+const { findAll } = require("../models/company");
 
 
 /** Middleware: Authenticate user.
@@ -21,6 +22,7 @@ function authenticateJWT(req, res, next) {
     if (authHeader) {
       const token = authHeader.replace(/^[Bb]earer /, "").trim();
       res.locals.user = jwt.verify(token, SECRET_KEY);
+      console.log("res.locals.user is --->", res.locals.user);
     }
     return next();
   } catch (err) {
@@ -42,8 +44,60 @@ function ensureLoggedIn(req, res, next) {
   }
 }
 
+/** Middleware to use before routes that require user to be an admin.
+ *
+ * If not, raises Unauthorized.
+ */
+
+function ensureAdmin(req, res, next) {
+  try {
+    console.log("ensureAdmin ran");
+    if (res.locals.user.isAdmin === false) throw new UnauthorizedError();
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+}
+
+/** Middleware to use before routes that allow a
+ *  user to alter their own information
+ *
+ * If not, raises Unauthorized
+ */
+
+// function ensureSameUser(req, res, next) {
+//   try {
+//     console.log("ensureSameUser ran");
+//     if (res.locals.user.username !== req.params.username) throw new UnauthorizedError();
+//     return next();
+//   } catch (err) {
+//     return next(err);
+//   }
+// }
+
+/** Middleware that checks if a user is either an admin OR the same person they're searching for
+ * 
+ * If not, raises Unauthorized
+ * 
+ */
+function isAuthorizedToAccessUserInfo(req, res, next) {
+
+  try {
+    if (res.locals.user.isAdmin === true || res.locals.user.username === req.params.username) {
+      return next();
+    }
+    else {
+      throw new UnauthorizedError();
+    }
+  } catch (err) {
+    return next(err);
+  }
+}
+
 
 module.exports = {
   authenticateJWT,
   ensureLoggedIn,
+  ensureAdmin,
+  isAuthorizedToAccessUserInfo
 };
