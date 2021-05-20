@@ -1,4 +1,6 @@
-const { sqlForPartialUpdate } = require("./sql");
+"use strict";
+
+const { sqlForPartialUpdate, sqlForFiltering } = require("./sql");
 const { BadRequestError } = require("../expressError");
 
 
@@ -13,14 +15,14 @@ describe("sqlForPartialUpdate", function () {
         testKey: "test_key_column",
         anotherKey: "another_key_column"
       }
-    )
+    );
     console.log("PARTIAL UPDATE RESULT IS --->", result);
     expect(result).toEqual(
       {
         setCols: '"test_key_column"=$1, "another_key_column"=$2',
         values: ["change to this", "also change this"]
       }
-    )
+    );
 
   });
 
@@ -32,10 +34,11 @@ describe("sqlForPartialUpdate", function () {
           testKey: "test_key_column",
           anotherKey: "another_key_column"
         }
-      )
+      );
+      fail();
     } catch (err) {
       expect(err instanceof BadRequestError).toBeTruthy();
-    }
+    };
   });
 
 });

@@ -18,16 +18,16 @@ class Company {
 
   static async create({ handle, name, description, numEmployees, logoUrl }) {
     const duplicateCheck = await db.query(
-        `SELECT handle
+      `SELECT handle
            FROM companies
            WHERE handle = $1`,
-        [handle]);
+      [handle]);
 
     if (duplicateCheck.rows[0])
       throw new BadRequestError(`Duplicate company: ${handle}`);
 
     const result = await db.query(
-        `INSERT INTO companies(
+      `INSERT INTO companies(
           handle,
           name,
           description,
@@ -36,13 +36,13 @@ class Company {
            VALUES
              ($1, $2, $3, $4, $5)
            RETURNING handle, name, description, num_employees AS "numEmployees", logo_url AS "logoUrl"`,
-        [
-          handle,
-          name,
-          description,
-          numEmployees,
-          logoUrl,
-        ],
+      [
+        handle,
+        name,
+        description,
+        numEmployees,
+        logoUrl,
+      ],
     );
     const company = result.rows[0];
 
@@ -56,7 +56,7 @@ class Company {
 
   static async findAll() {
     const companiesRes = await db.query(
-        `SELECT handle,
+      `SELECT handle,
                 name,
                 description,
                 num_employees AS "numEmployees",
@@ -65,6 +65,73 @@ class Company {
            ORDER BY name`);
     return companiesRes.rows;
   }
+
+  /** Dynamically generates injection safe SQL for filtering
+ * Accepts an object of data to filter.
+ * 
+ * Returns an object with two keys, first key's value being a string of the
+ * SQL-friendly WHERE clause for filtering, including SQL injection-safe
+ * placeholders ($1, $2, etc), which can be inserted directly into the WHERE
+ * clause. The second key's value will be an array of all the values corresponding
+ * to the placeholder values.
+ * 
+ * Throws BadRequestError if invalid criteria.
+ * 
+ * TODO include example of input+output
+ * 
+ */
+
+  static _sqlForFilteringCompanies(dataToFilter) {
+    const keys = Object.keys(dataToFilter);
+    if (dataToFilter.minEmployees > dataToFilter.maxEmployees) {
+      throw new BadRequestError("Bad criteria");
+    };
+
+    let values = [];
+
+    const criteria = keys.map(function (criteriaName, idx) {
+      if (criteriaName === "minEmployees") {
+        values.push(dataToFilter[criteriaName]);
+        return `num_employees >= $${idx + 1}`;
+      }
+      else if (criteriaName === "maxEmployees") {
+        values.push(dataToFilter[criteriaName]);
+        return `num_employees <= $${idx + 1}`;
+      }
+      else if (criteriaName === "name") {
+        values.push(`%${dataToFilter[criteriaName]}%`);
+        return `name ILIKE $${idx + 1}`;
+      }
+    });
+    return {
+      setCriteria: criteria.join(" AND "),
+      values: values
+    };
+  };
+
+  /** Given query parameters for companies, return data about companies that meet criteria
+   * Accepts {name: "net", minEmployees: 1}
+   * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
+   */
+  static async filterCompanies(data) {
+    // console.log("filterCompanies data --->", data)
+    const { setCriteria, values } = this._sqlForFilteringCompanies(data);
+    // console.log("setCriteria filterCompanies --->", setCriteria)
+    // console.log("values filterCompanies", values)
+    const companiesRes = await db.query(
+      `SELECT handle,
+                name,
+                description,
+                num_employees AS "numEmployees",
+                logo_url AS "logoUrl"
+           FROM companies
+           WHERE ${setCriteria}
+           ORDER BY name`,
+      values
+    );
+    // console.log("companiesRes from filterCompanies--->", companiesRes.rows)
+    return companiesRes.rows;
+  };
 
   /** Given a company handle, return data about company.
    *
@@ -76,14 +143,14 @@ class Company {
 
   static async get(handle) {
     const companyRes = await db.query(
-        `SELECT handle,
+      `SELECT handle,
                 name,
                 description,
                 num_employees AS "numEmployees",
                 logo_url AS "logoUrl"
            FROM companies
            WHERE handle = $1`,
-        [handle]);
+      [handle]);
 
     const company = companyRes.rows[0];
 
@@ -106,11 +173,11 @@ class Company {
 
   static async update(handle, data) {
     const { setCols, values } = sqlForPartialUpdate(
-        data,
-        {
-          numEmployees: "num_employees",
-          logoUrl: "logo_url",
-        });
+      data,
+      {
+        numEmployees: "num_employees",
+        logoUrl: "logo_url",
+      });
     const handleVarIdx = "$" + (values.length + 1);
 
     const querySql = `
@@ -133,11 +200,11 @@ class Company {
 
   static async remove(handle) {
     const result = await db.query(
-        `DELETE
+      `DELETE
            FROM companies
            WHERE handle = $1
            RETURNING handle`,
-        [handle]);
+      [handle]);
     const company = result.rows[0];
 
     if (!company) throw new NotFoundError(`No company: ${handle}`);
