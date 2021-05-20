@@ -48,24 +48,30 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
-  // console.log("req.query--->", req.query)
-  // console.log("object keys-->", Object.keys(req.query))
-  // TODO: if minEmployees or maxEmployees in req.query, change value to int
-  const validator = jsonschema.validate(req.query, companyFilterSchema);
-  if (!validator.valid){
+
+  //make a copy of req.query so we can change any employee counts to integers
+  //if applicable
+  let queryParameters = req.query;
+
+  if (Object.keys(queryParameters).includes("minEmployees")) {
+    queryParameters["minEmployees"] = +queryParameters["minEmployees"];
+  }
+  if (Object.keys(queryParameters).includes("maxEmployees")) {
+    queryParameters["maxEmployees"] = +queryParameters["maxEmployees"];
+  }
+
+  const validator = jsonschema.validate(queryParameters, companyFilterSchema);
+  if (!validator.valid) {
     const errs = validator.errors.map(e => e.stack);
     throw new BadRequestError(errs);
   };
 
-  if(Object.keys(req.query).length > 0){
-    // console.log("filter block reached")
-    const companies = await Company.filterCompanies(req.query);
-    // console.log("filterCompany called!")
-    return res.json({ companies });
-  };
+  let companies = Object.keys(req.query).length > 0 ?
+    await Company.filterCompanies(req.query) :
+    await Company.findAll();
 
-  const companies = await Company.findAll();
   return res.json({ companies });
+
 });
 
 /** GET /[handle]  =>  { company }
