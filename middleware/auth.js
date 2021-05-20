@@ -52,33 +52,18 @@ function ensureLoggedIn(req, res, next) {
 function ensureAdmin(req, res, next) {
   try {
     console.log("ensureAdmin ran");
-    if (res.locals.user.isAdmin === false) throw new UnauthorizedError();
+    if (res.locals.user.isAdmin !== true) throw new UnauthorizedError();
     return next();
   } catch (err) {
     return next(err);
   }
 }
 
-/** Middleware to use before routes that allow a
- *  user to alter their own information
- *
- * If not, raises Unauthorized
- */
-
-// function ensureSameUser(req, res, next) {
-//   try {
-//     console.log("ensureSameUser ran");
-//     if (res.locals.user.username !== req.params.username) throw new UnauthorizedError();
-//     return next();
-//   } catch (err) {
-//     return next(err);
-//   }
-// }
-
 /** Middleware that checks if a user is either an admin OR the same person they're searching for
  * 
  * If not, raises Unauthorized
  * 
+ * TODO: update function name to pattern match the other ensure functions
  */
 function isAuthorizedToAccessUserInfo(req, res, next) {
 

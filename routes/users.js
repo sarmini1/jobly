@@ -59,7 +59,7 @@ router.get("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
  *
  * Returns { username, firstName, lastName, isAdmin }
  *
- * Authorization required: login
+ * Authorization required: login TODO add auth reqs
  **/
 
 router.get("/:username", ensureLoggedIn, isAuthorizedToAccessUserInfo,
@@ -76,7 +76,7 @@ router.get("/:username", ensureLoggedIn, isAuthorizedToAccessUserInfo,
  *
  * Returns { username, firstName, lastName, email, isAdmin }
  *
- * Authorization required: login
+ * Authorization required: login TODO add auth reqs
  **/
 
 router.patch("/:username", ensureLoggedIn, isAuthorizedToAccessUserInfo,
@@ -94,7 +94,7 @@ router.patch("/:username", ensureLoggedIn, isAuthorizedToAccessUserInfo,
 
 /** DELETE /[username]  =>  { deleted: username }
  *
- * Authorization required: login
+ * Authorization required: login TODO add auth reqs
  **/
 
 router.delete("/:username", ensureLoggedIn, isAuthorizedToAccessUserInfo,

@@ -67,17 +67,22 @@ class Company {
   }
 
   /** Dynamically generates injection safe SQL for filtering
- * Accepts an object of data to filter.
+ * Accepts an object of data to filter: 
+ * 
+ * { minEmployees: 3, name: "net"}
  * 
  * Returns an object with two keys, first key's value being a string of the
  * SQL-friendly WHERE clause for filtering, including SQL injection-safe
  * placeholders ($1, $2, etc), which can be inserted directly into the WHERE
  * clause. The second key's value will be an array of all the values corresponding
- * to the placeholder values.
+ * to the placeholder values:
+ * 
+ * {
+ *  setCriteria: "num_employees>=$1 AND name ILIKE $2",
+ *  values: [3, '%net%']
+ * }
  * 
  * Throws BadRequestError if invalid criteria.
- * 
- * TODO include example of input+output
  * 
  */
 
@@ -114,10 +119,7 @@ class Company {
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    */
   static async filterCompanies(data) {
-    // console.log("filterCompanies data --->", data)
     const { setCriteria, values } = this._sqlForFilteringCompanies(data);
-    // console.log("setCriteria filterCompanies --->", setCriteria)
-    // console.log("values filterCompanies", values)
     const companiesRes = await db.query(
       `SELECT handle,
                 name,
@@ -129,7 +131,6 @@ class Company {
            ORDER BY name`,
       values
     );
-    // console.log("companiesRes from filterCompanies--->", companiesRes.rows)
     return companiesRes.rows;
   };
 

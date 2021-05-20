@@ -61,7 +61,7 @@ describe("ensureLoggedIn", function () {
   test("works", function () {
     expect.assertions(1);
     const req = {};
-    const res = { locals: { user: { username: "test", isAdmin: false } } }; //ASK ABOUT isAdmin variable formatting
+    const res = { locals: { user: { username: "test", isAdmin: false } } };
     const next = function (err) {
       expect(err).toBeFalsy();
     };
@@ -94,6 +94,16 @@ describe("ensureAdmin", function () {
     expect.assertions(1);
     const req = {};
     const res = { locals: { user: { username: "test", isAdmin: false } } };
+    const next = function (err) {
+      expect(err instanceof UnauthorizedError).toBeTruthy();
+    };
+    ensureAdmin(req, res, next);
+  });
+
+  test("unauthorized if missing admin value", function () {
+    expect.assertions(1);
+    const req = {};
+    const res = { locals: { user: { username: "test" } } };
     const next = function (err) {
       expect(err instanceof UnauthorizedError).toBeTruthy();
     };

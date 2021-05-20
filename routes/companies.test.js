@@ -129,7 +129,7 @@ describe("GET /companies", function () {
     });
   });
 
-  test("accepts query for filtering", async function () {
+  test("accepts query for filtering by min", async function () {
     const resp = await request(app).get("/companies?minEmployees=3")
     expect(resp.body).toEqual({
       companies:
@@ -145,7 +145,23 @@ describe("GET /companies", function () {
     });
   });
 
-  test("accepts queries for filtering", async function () {
+  test("accepts query for filtering by max", async function () {
+    const resp = await request(app).get("/companies?maxEmployees=1")
+    expect(resp.body).toEqual({
+      companies:
+        [
+          {
+            handle: "c1",
+            name: "C1",
+            description: "Desc1",
+            numEmployees: 1,
+            logoUrl: "http://c1.img",
+          }
+        ],
+    });
+  });
+
+  test("accepts queries for filtering w multiple queries", async function () {
     const resp = await request(app).get("/companies?minEmployees=1&name=c");
     expect(resp.body).toEqual({
       companies:
