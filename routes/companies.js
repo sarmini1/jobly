@@ -22,7 +22,7 @@ const router = new express.Router();
  *
  * Returns { handle, name, description, numEmployees, logoUrl }
  *
- * Authorization required: login
+ * Authorization required: login, is admin
  */
 
 router.post("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
@@ -49,8 +49,6 @@ router.post("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
 
 router.get("/", async function (req, res, next) {
 
-  //make a copy of req.query so we can change any employee counts to integers
-  //if applicable
   let queryParameters = req.query;
 
   if (Object.keys(queryParameters).includes("minEmployees")) {
@@ -95,7 +93,7 @@ router.get("/:handle", async function (req, res, next) {
  *
  * Returns { handle, name, description, numEmployees, logo_url }
  *
- * Authorization required: login
+ * Authorization required: login, is admin
  */
 
 router.patch("/:handle", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
@@ -111,7 +109,7 @@ router.patch("/:handle", ensureLoggedIn, ensureAdmin, async function (req, res, 
 
 /** DELETE /[handle]  =>  { deleted: handle }
  *
- * Authorization: login
+ * Authorization: login, is admin
  */
 
 router.delete("/:handle", ensureLoggedIn, ensureAdmin, async function (req, res, next) {

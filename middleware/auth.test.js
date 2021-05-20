@@ -6,7 +6,7 @@ const {
   authenticateJWT,
   ensureLoggedIn,
   ensureAdmin,
-  isAuthorizedToAccessUserInfo
+  ensureAuthToAccessInfo
 } = require("./auth");
 
 
@@ -111,7 +111,7 @@ describe("ensureAdmin", function () {
   });
 });
 
-describe("isAuthorizedToAccessUserInfo", function () {
+describe("ensureAuthToAccessInfo", function () {
   test("works for admin", function () {
     expect.assertions(1);
     const req = { params: { username: "notthisuser" } };
@@ -119,7 +119,7 @@ describe("isAuthorizedToAccessUserInfo", function () {
     const next = function (err) {
       expect(err).toBeFalsy();
     };
-    isAuthorizedToAccessUserInfo(req, res, next);
+    ensureAuthToAccessInfo(req, res, next);
   });
 
   test("unauthorized if not admin AND not user", function () {
@@ -129,7 +129,7 @@ describe("isAuthorizedToAccessUserInfo", function () {
     const next = function (err) {
       expect(err).toBeTruthy();
     };
-    isAuthorizedToAccessUserInfo(req, res, next);
+    ensureAuthToAccessInfo(req, res, next);
   });
 
   test("unauthorized if not admin but is user", function () {
@@ -139,6 +139,6 @@ describe("isAuthorizedToAccessUserInfo", function () {
     const next = function (err) {
       expect(err).toBeFalsy();
     };
-    isAuthorizedToAccessUserInfo(req, res, next);
+    ensureAuthToAccessInfo(req, res, next);
   });
 });

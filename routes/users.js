@@ -7,7 +7,7 @@ const jsonschema = require("jsonschema");
 const express = require("express");
 const { ensureLoggedIn,
   ensureAdmin,
-  isAuthorizedToAccessUserInfo } = require("../middleware/auth");
+  ensureAuthToAccessInfo } = require("../middleware/auth");
 const { BadRequestError } = require("../expressError");
 const User = require("../models/user");
 const { createToken } = require("../helpers/tokens");
@@ -59,10 +59,10 @@ router.get("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
  *
  * Returns { username, firstName, lastName, isAdmin }
  *
- * Authorization required: login TODO add auth reqs
+ * Authorization required: login, is an admin or same user
  **/
 
-router.get("/:username", ensureLoggedIn, isAuthorizedToAccessUserInfo,
+router.get("/:username", ensureLoggedIn, ensureAuthToAccessInfo,
   async function (req, res, next) {
     const user = await User.get(req.params.username);
     return res.json({ user });
@@ -76,10 +76,10 @@ router.get("/:username", ensureLoggedIn, isAuthorizedToAccessUserInfo,
  *
  * Returns { username, firstName, lastName, email, isAdmin }
  *
- * Authorization required: login TODO add auth reqs
+ * Authorization required: login, is an admin or same user
  **/
 
-router.patch("/:username", ensureLoggedIn, isAuthorizedToAccessUserInfo,
+router.patch("/:username", ensureLoggedIn, ensureAuthToAccessInfo,
   async function (req, res, next) {
     const validator = jsonschema.validate(req.body, userUpdateSchema);
     if (!validator.valid) {
@@ -94,10 +94,10 @@ router.patch("/:username", ensureLoggedIn, isAuthorizedToAccessUserInfo,
 
 /** DELETE /[username]  =>  { deleted: username }
  *
- * Authorization required: login TODO add auth reqs
+ * Authorization required: login, is an admin or same user
  **/
 
-router.delete("/:username", ensureLoggedIn, isAuthorizedToAccessUserInfo,
+router.delete("/:username", ensureLoggedIn, ensureAuthToAccessInfo,
   async function (req, res, next) {
     await User.remove(req.params.username);
     return res.json({ deleted: req.params.username });

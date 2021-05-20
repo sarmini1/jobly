@@ -65,7 +65,7 @@ function ensureAdmin(req, res, next) {
  * 
  * TODO: update function name to pattern match the other ensure functions
  */
-function isAuthorizedToAccessUserInfo(req, res, next) {
+function ensureAuthToAccessInfo(req, res, next) {
 
   try {
     if (res.locals.user.isAdmin === true || res.locals.user.username === req.params.username) {
@@ -84,5 +84,5 @@ module.exports = {
   authenticateJWT,
   ensureLoggedIn,
   ensureAdmin,
-  isAuthorizedToAccessUserInfo
+  ensureAuthToAccessInfo
 };
