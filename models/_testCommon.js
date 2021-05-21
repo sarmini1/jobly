@@ -3,9 +3,7 @@ const bcrypt = require("bcrypt");
 const db = require("../db.js");
 const { BCRYPT_WORK_FACTOR } = require("../config");
 
-// let jobId1;
-// let jobId2;
-let jobIds = []
+let jobIds = [];
 
 async function commonBeforeAll() {
   // noinspection SqlWithoutWhere
@@ -42,8 +40,6 @@ async function commonBeforeAll() {
         RETURNING id`)
   jobIds.length = 0;
   jobIds.push(jobs.rows[0].id);
-  // jobId1 = jobIds.rows[0].id;
-  // jobId2 = jobIds.rows[1].id;
 }
 
 async function commonBeforeEach() {

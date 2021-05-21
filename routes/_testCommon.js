@@ -4,6 +4,9 @@ const db = require("../db.js");
 const User = require("../models/user");
 const Company = require("../models/company");
 const { createToken } = require("../helpers/tokens");
+const Job = require("../models/job.js");
+const { jobIds } = require("../models/_testCommon.js");
+let jobsIds = [];
 
 async function commonBeforeAll() {
   // noinspection SqlWithoutWhere
@@ -12,29 +15,49 @@ async function commonBeforeAll() {
   await db.query("DELETE FROM companies");
 
   await Company.create(
-      {
-        handle: "c1",
-        name: "C1",
-        numEmployees: 1,
-        description: "Desc1",
-        logoUrl: "http://c1.img",
-      });
+    {
+      handle: "c1",
+      name: "C1",
+      numEmployees: 1,
+      description: "Desc1",
+      logoUrl: "http://c1.img",
+    });
   await Company.create(
-      {
-        handle: "c2",
-        name: "C2",
-        numEmployees: 2,
-        description: "Desc2",
-        logoUrl: "http://c2.img",
-      });
+    {
+      handle: "c2",
+      name: "C2",
+      numEmployees: 2,
+      description: "Desc2",
+      logoUrl: "http://c2.img",
+    });
   await Company.create(
-      {
-        handle: "c3",
-        name: "C3",
-        numEmployees: 3,
-        description: "Desc3",
-        logoUrl: "http://c3.img",
-      });
+    {
+      handle: "c3",
+      name: "C3",
+      numEmployees: 3,
+      description: "Desc3",
+      logoUrl: "http://c3.img",
+    });
+
+  const job1 = await Job.create(
+    {
+      title: "j1",
+      salary: 15000,
+      equity: "0.021",
+      companyHandle: "c1"
+    });
+
+  const job2 = await Job.create(
+    {
+      title: "j2",
+      salary: 15000,
+      equity: "0.025",
+      companyHandle: "c2"
+    });
+
+    jobIds.length = 0;
+    jobIds.push(job1.id);
+    jobIds.push(job2.id);
 
   await User.register({
     username: "u1",
@@ -60,6 +83,7 @@ async function commonBeforeAll() {
     password: "password3",
     isAdmin: false,
   });
+
 }
 
 async function commonBeforeEach() {
@@ -83,6 +107,7 @@ module.exports = {
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
+  jobIds,
   u1Token,
   admin1Token
 };
