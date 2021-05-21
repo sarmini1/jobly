@@ -103,5 +103,6 @@ router.delete("/:username", ensureLoggedIn, ensureAuthToAccessInfo,
     return res.json({ deleted: req.params.username });
   });
 
+//TODO add a route to allow a user to apply for a job
 
 module.exports = router;

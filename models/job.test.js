@@ -38,7 +38,7 @@ describe("create", function () {
         expect(job).toEqual({...newJob, id: expect.any(Number)});
 
         const result = await db.query(
-            `SELECT id, title, salary, equity, company_handle
+            `SELECT id, title, salary, equity, company_handle as "companyHandle"
              FROM jobs
              WHERE company_handle = 'c3'`);
         console.log("result.rows for createjob", result.rows)
@@ -48,12 +48,11 @@ describe("create", function () {
                 title: "testjob3",
                 salary: 60000,
                 equity: "0",
-                company_handle: "c3"
+                companyHandle: "c3"
             },
         ]);
     });
 
-    // TODO: come back to this test, what does FK impossible ref return
     test("bad request: company doesn't exist", async function () {
         try {
             await Job.create(badJob);
@@ -131,12 +130,12 @@ describe("update", function () {
       });
   
       const result = await db.query(
-            `SELECT id, title, salary, equity, company_handle
+            `SELECT id, title, salary, equity, company_handle AS "companyHandle"
              FROM jobs
              WHERE id = $1`,
              [jobIds[0]]);
       expect(result.rows).toEqual([{
-        company_handle: "c1",
+        companyHandle: "c1",
         equity: "0",
         id: jobIds[0],
         ...updateData,
@@ -158,12 +157,12 @@ describe("update", function () {
       });
   
       const result = await db.query(
-            `SELECT id, title, salary, equity, company_handle
+            `SELECT id, title, salary, equity, company_handle AS "companyHandle"
             FROM jobs
             WHERE id = $1`,
             [jobIds[0]]);
       expect(result.rows).toEqual([{
-        company_handle: "c1",
+        companyHandle: "c1",
         equity: "0",
         id: jobIds[0],
         title: "testjob1",
@@ -230,3 +229,5 @@ describe("remove", function () {
       }
     });
   });
+
+//TODO add additional tests for filtering jobs

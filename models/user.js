@@ -206,5 +206,6 @@ class User {
   }
 }
 
+//TODO add a method to allow a user to apply for a job
 
 module.exports = User;

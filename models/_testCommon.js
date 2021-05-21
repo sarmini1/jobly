@@ -42,7 +42,6 @@ async function commonBeforeAll() {
         RETURNING id`)
   jobIds.length = 0;
   jobIds.push(jobs.rows[0].id);
-  // TODO: find name for jobIdsArray
   // jobId1 = jobIds.rows[0].id;
   // jobId2 = jobIds.rows[1].id;
 }

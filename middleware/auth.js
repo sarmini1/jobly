@@ -63,7 +63,6 @@ function ensureAdmin(req, res, next) {
  * 
  * If not, raises Unauthorized
  * 
- * TODO: update function name to pattern match the other ensure functions
  */
 function ensureAuthToAccessInfo(req, res, next) {
 
